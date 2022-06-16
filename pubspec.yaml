@@ -36,6 +36,10 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter_paystack: ^1.0.5+1
   flutter_form_builder: ^7.1.1
+  http: ^0.13.4
+  cloud_firestore: ^3.1.10
+  firebase_auth: ^3.3.12
+  firebase_core: ^1.14.0
 
 dev_dependencies:
   flutter_test:

@@ -46,7 +46,5 @@ app.*.map.json
 /android/app/release
 
 
-
-
-
-*.json
+# <To Do>
+/android/app/google-services.json
