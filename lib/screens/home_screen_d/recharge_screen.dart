@@ -10,7 +10,7 @@ class RechargeUnitsScreen extends StatelessWidget {
       GlobalKey<FormBuilderState>();
   final TextEditingController _amountTextController = TextEditingController();
 
-  final Map<String, dynamic> _rechargeScreenStyle = {
+  final Map<String, TextStyle> _rechargeScreenStyle = {
     // 'title': const TextStyle(
     //   fontFamily: 'ComicNeue',
     //   fontSize: 25.0,

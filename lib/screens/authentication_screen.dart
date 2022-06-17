@@ -23,7 +23,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen>
   final _inPasswordController = TextEditingController();
   final _upPasswordController = TextEditingController();
 
-  final Map<String, dynamic> _authStyle = {
+  final Map<String, TextStyle> _authStyle = {
       'title': const TextStyle(
         fontFamily: 'ComicNeue',
         fontSize: 25.0,

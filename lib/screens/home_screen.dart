@@ -12,7 +12,7 @@ class HomeScreen extends StatelessWidget {
 
   static const routeName = 'home';
   final UserBackend _userBackend = UserBackend();
-  final Map<String, dynamic> _homeScreenStyle = {
+  final Map<String, TextStyle> _homeScreenStyle = {
     // 'title': const TextStyle(
     //   fontFamily: 'ComicNeue',
     //   fontSize: 25.0,
