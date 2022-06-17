@@ -23,7 +23,18 @@ class _AuthenticationScreenState extends State<AuthenticationScreen>
   final _inPasswordController = TextEditingController();
   final _upPasswordController = TextEditingController();
 
-  final Map<String, TextStyle> _styles = {
+  final Map<String, dynamic> _authStyle = {
+      'title': const TextStyle(
+        fontFamily: 'ComicNeue',
+        fontSize: 25.0,
+      ),
+      'toolbar': const TextStyle(
+        fontFamily: 'Abel',
+        fontSize: 19,
+      ),
+    };
+
+  final Map<String, TextStyle> _formStyle = {
     'formlabel': const TextStyle(
       fontFamily: 'Montserrat',
       fontSize: 14.0,
@@ -65,17 +76,6 @@ class _AuthenticationScreenState extends State<AuthenticationScreen>
   @override
   Widget build(BuildContext context) {
     final _device = MediaQuery.of(context);
-
-    final Map<String, dynamic> _authStyle = {
-      'title': const TextStyle(
-        fontFamily: 'ComicNeue',
-        fontSize: 25.0,
-      ),
-      'toolbar': const TextStyle(
-        fontFamily: 'Abel',
-        fontSize: 19,
-      ),
-    };
 
     return Scaffold(
       // resizeToAvoidBottomInset: false,
@@ -126,11 +126,11 @@ class _AuthenticationScreenState extends State<AuthenticationScreen>
                 children: [
                   LoginForm(
                       formKey: _inFormKey,
-                      styles: _styles,
+                      styles: _formStyle,
                       passwordController: _inPasswordController),
                   SignUpForm(
                       formKey: _upFormKey,
-                      styles: _styles,
+                      styles: _formStyle,
                       usernameController: _usernameController,
                       passwordController: _upPasswordController),
                 ],

@@ -2,12 +2,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
-class BuyUnits extends StatelessWidget {
-  BuyUnits({Key? key}) : super(key: key);
-  static const routeName = 'home:buy-units';
+class RechargeUnitsScreen extends StatelessWidget {
+  RechargeUnitsScreen({Key? key}) : super(key: key);
+  static const routeName = 'home:recharge';
 
-  final GlobalKey<FormBuilderState> _upFormKey = GlobalKey<FormBuilderState>();
+  final GlobalKey<FormBuilderState> _purchaseFormKey =
+      GlobalKey<FormBuilderState>();
   final TextEditingController _amountTextController = TextEditingController();
+
+  final Map<String, dynamic> _rechargeScreenStyle = {
+    // 'title': const TextStyle(
+    //   fontFamily: 'ComicNeue',
+    //   fontSize: 25.0,
+    // ),
+    'toolbar': const TextStyle(
+      fontFamily: 'Abel',
+      fontSize: 21,
+    ),
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +27,10 @@ class BuyUnits extends StatelessWidget {
     final Map<String, String> _payData = {};
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ore mi'),
+        title: Text(
+          'Recharge',
+          style: _rechargeScreenStyle['toolbar'],
+        ),
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
@@ -30,7 +45,7 @@ class BuyUnits extends StatelessWidget {
                 border: Border.all(width: 1.0),
               ),
               child: FormBuilder(
-                key: _upFormKey,
+                key: _purchaseFormKey,
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
@@ -38,9 +53,8 @@ class BuyUnits extends StatelessWidget {
                         name: 'meter-select',
                         items: const [
                           DropdownMenuItem(child: Text('Meter 1')),
-                          DropdownMenuItem(child: Text('Meter 2'))
+                          DropdownMenuItem(child: Text('Meter 2')),
                         ],
-                        onTap: () => {},
                       ),
                       FormBuilderTextField(
                         name: 'amount-enter',

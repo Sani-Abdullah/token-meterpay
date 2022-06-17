@@ -2,25 +2,42 @@
 import 'package:flutter/material.dart';
 
 // Internal
-import './home_screen_d/buy_units.dart';
-import './home_screen_d/purchase_history.dart';
+import './home_screen_d/recharge_screen.dart';
+import './home_screen_d/purchase_history_screen.dart';
 
 import '../helpers/user_backend.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  HomeScreen({Key? key}) : super(key: key);
 
   static const routeName = 'home';
+  final UserBackend _userBackend = UserBackend();
+  final Map<String, dynamic> _homeScreenStyle = {
+    // 'title': const TextStyle(
+    //   fontFamily: 'ComicNeue',
+    //   fontSize: 25.0,
+    // ),
+    'toolbar': const TextStyle(
+      fontFamily: 'Abel',
+      fontSize: 21,
+    ),
+  };
 
   @override
   Widget build(BuildContext context) {
-    final _userBackend = UserBackend();
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Token Purchase'),
+        title: Text(
+          'Token Purchase',
+          style: _homeScreenStyle['toolbar'],
+        ),
+        actionsIconTheme: const IconThemeData(
+          opacity: 0.8,
+          size: 23.0,
+        ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 15.0),
+            padding: const EdgeInsets.only(right: 20.0),
             child: PopupMenuButton(
               child: const Icon(
                 Icons.menu,
@@ -37,10 +54,21 @@ class HomeScreen extends StatelessWidget {
                       'Logout',
                       style:
                           TextStyle(fontFamily: 'Monteserat', fontSize: 15.0),
+                    )),
+                const PopupMenuItem(
+                    value: 1,
+                    child: Text(
+                      'About Us',
+                      style:
+                          TextStyle(fontFamily: 'Monteserat', fontSize: 15.0),
                     ))
               ],
-              onSelected: (_) {
-                _userBackend.logOut();
+              onSelected: (value) {
+                if (value == 0) {
+                  _userBackend.logOut();
+                } else if (value == 1) {
+                  //<TBD> Show About Us Page
+                }
               },
             ),
           ),
@@ -66,12 +94,12 @@ class HomeScreen extends StatelessWidget {
           ListTile(
             // selected: true,
             leading: const Icon(
-              Icons.mic,
+              Icons.money,
               color: Colors.deepOrange,
             ),
-            title: const Text('Buy Units'),
+            title: const Text('Recharge Meter'),
             onTap: () {
-              Navigator.of(context).pushNamed(BuyUnits.routeName);
+              Navigator.of(context).pushNamed(RechargeUnitsScreen.routeName);
             },
           ),
           ListTile(
@@ -82,7 +110,7 @@ class HomeScreen extends StatelessWidget {
             ),
             title: const Text('Purchase History'),
             onTap: () {
-              Navigator.of(context).pushNamed(PurchaseHistory.routeName);
+              Navigator.of(context).pushNamed(PurchaseHistoryScreen.routeName);
             },
           ),
           const Divider(),
