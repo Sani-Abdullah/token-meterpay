@@ -1,4 +1,4 @@
-package com.example.meterpay
+package com.nasrda.meterpay
 
 import io.flutter.embedding.android.FlutterActivity
 

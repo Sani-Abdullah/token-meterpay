@@ -52,11 +52,11 @@ class UserBackend {
     });
   }
 
-  void signUp(String email, String password, String telephone,
+  void signUp(String email, String password, String username, String telephone,
       Map<String, dynamic> data) {
     _auth
         .createUserWitEmailAndPassword(email, password)
-        .then((instance) => setUserInitialData(instance, telephone))
+        .then((instance) => setUserInitialData(instance, username, telephone))
         .then((_) => data['callback']())
         .timeout(const Duration(seconds: 10))
         .onError((error, __) {
@@ -92,9 +92,14 @@ class UserBackend {
     ;
   }
 
-  void setUserInitialData(User? instance, String telephone) {
+  void setUserInitialData(User? instance, String username, String telephone) {
     _databaseRoot.collection('users').doc(instance?.uid).set({
       'telephone': telephone,
+      'username': username,
     });
+  }
+
+  void logOut() {
+    _auth.signOut();
   }
 }

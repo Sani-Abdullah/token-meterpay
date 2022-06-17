@@ -79,17 +79,43 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
-  #
+  fonts:
+    - family: Montserrat
+      fonts:
+        - asset: assets/fonts/Montserrat/Montserrat-Regular.ttf
+    - family: AdventPro
+      fonts:
+        - asset: assets/fonts/AdventPro/AdventPro-Regular.ttf
+        - asset: assets/fonts/AdventPro/AdventPro-Bold.ttf
+          weight: 700
+    - family: Abel
+      fonts:
+        - asset: assets/fonts/Abel/Abel-Regular.ttf
+    - family: ComicNeue
+      fonts:
+        - asset: assets/fonts/ComicNeue/ComicNeue-Regular.ttf
+        - asset: assets/fonts/ComicNeue/ComicNeue-Bold.ttf
+          weight: 700
+    - family: IndieFLower
+      fonts:
+        - asset: assets/fonts/IndieFLower/IndieFLower-Regular.ttf
+    - family: PTSans
+      fonts:
+        - asset: assets/fonts/PTSans/PTSans-Regular.ttf
+        - asset: assets/fonts/PTSans/PTSans-Bold.ttf
+          weight: 700
+    - family: Armata
+      fonts:
+        - asset: assets/fonts/Armata/Armata-Regular.ttf
+    - family: Dosis
+      fonts:
+        - asset: assets/fonts/Dosis/Dosis-Regular.ttf
+        - asset: assets/fonts/Dosis/Dosis-Bold.ttf
+          weight: 700
+    - family: Rajdhani
+      fonts:
+        - asset: assets/fonts/Rajdhani/Rajdhani-Regular.ttf
+        - asset: assets/fonts/Rajdhani/Rajdhani-Bold.ttf
+          weight: 700
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
