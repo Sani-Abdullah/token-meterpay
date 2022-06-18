@@ -1,6 +1,11 @@
 // External
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:money_formatter/money_formatter.dart';
+
+// Internal
+import '../models/transaction_record.dart';
+import '../screens/home_screen_d/receipt_preview_screen.dart';
 
 class RecordTile extends StatelessWidget {
   final Map<String, TextStyle> _recordTileStyle = {
@@ -23,7 +28,9 @@ class RecordTile extends StatelessWidget {
     ),
   };
 
-  RecordTile({Key? key}) : super(key: key);
+  final TransactionRecord txnRecord;
+
+  RecordTile({Key? key, required this.txnRecord}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -32,8 +39,8 @@ class RecordTile extends StatelessWidget {
       child: Stack(
         // fit: StackFit.expand,
         children: [
-          DetailsView(recordTileStyle: _recordTileStyle),
-          const OptionsView(),
+          DetailsView(recordTileStyle: _recordTileStyle, txnRecord: txnRecord),
+          OptionsView(txnRecord: txnRecord),
         ],
       ),
     );
@@ -41,9 +48,36 @@ class RecordTile extends StatelessWidget {
 }
 
 class OptionsView extends StatelessWidget {
+  final TransactionRecord txnRecord;
   const OptionsView({
     Key? key,
+    required this.txnRecord,
   }) : super(key: key);
+
+  Widget optionButton(
+    String title,
+    Icon icon,
+    Color color,
+    void Function() handler,
+  ) {
+    return OutlinedButton.icon(
+      onPressed: handler,
+      icon: icon,
+      label: Text(title),
+      style: ButtonStyle(
+          side: MaterialStateProperty.all(
+              const BorderSide(color: Colors.black87)),
+          alignment: Alignment.center,
+          foregroundColor:
+              MaterialStateProperty.all(Colors.white.withOpacity(0.8)),
+          backgroundColor: MaterialStateProperty.all(color),
+          shape: MaterialStateProperty.all(
+            const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+            ),
+          )),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,38 +92,12 @@ class OptionsView extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          OutlinedButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.picture_as_pdf_outlined),
-            label: const Text('Save PDF'),
-            style: ButtonStyle(
-                side: MaterialStateProperty.all(
-                    const BorderSide(color: Colors.black87)),
-                alignment: Alignment.center,
-                foregroundColor: MaterialStateProperty.all(Colors.white.withOpacity(.80)),
-                backgroundColor: MaterialStateProperty.all(const Color.fromARGB(52, 255, 153, 0)),
-                shape: MaterialStateProperty.all(
-                  const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                  ),
-                )),
-          ),
-          OutlinedButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.image_outlined),
-            label: const Text('Save Image'),
-            style: ButtonStyle(
-                side: MaterialStateProperty.all(
-                    const BorderSide(color: Colors.black87)),
-                alignment: Alignment.center,
-                foregroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.8)),
-                backgroundColor: MaterialStateProperty.all(Colors.black.withOpacity(.55)),
-                shape: MaterialStateProperty.all(
-                  const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                  ),
-                )),
-          ),
+          optionButton('Preview', const Icon(Icons.preview_outlined),
+              Colors.lightGreen.withOpacity(.45), () => Navigator.of(context).pushNamed(ReceiptPreviewScreen.routeName, arguments: txnRecord)),
+          optionButton('Save PDF', const Icon(Icons.picture_as_pdf_outlined),
+              const Color.fromARGB(52, 255, 153, 0), () {}),
+          optionButton('Save Image', const Icon(Icons.image_outlined),
+              Colors.black.withOpacity(.55), () {}),
         ],
       ),
     );
@@ -97,8 +105,10 @@ class OptionsView extends StatelessWidget {
 }
 
 class DetailsView extends StatelessWidget {
+  final TransactionRecord txnRecord;
   const DetailsView({
     Key? key,
+    required this.txnRecord,
     required Map<String, TextStyle> recordTileStyle,
   })  : _recordTileStyle = recordTileStyle,
         super(key: key);
@@ -107,6 +117,18 @@ class DetailsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final MoneyFormatter _priceGross = MoneyFormatter(
+      amount: double.parse(txnRecord.priceGross), // product.cost
+      settings: MoneyFormatterSettings(
+        // symbol: '₦',
+        symbol: 'N ',
+        thousandSeparator: ',',
+        decimalSeparator: '.',
+        symbolAndNumberSeparator: '',
+        fractionDigits: 2,
+        // compactFormatType: CompactFormatType.short,
+      ),
+    );
     return Column(
       children: [
         InkWell(
@@ -127,7 +149,7 @@ class DetailsView extends StatelessWidget {
                     Flexible(
                       flex: 2,
                       child: Chip(
-                        label: const FittedBox(child: Text('N45,000')),
+                        label: FittedBox(child: Text(_priceGross.output.symbolOnLeft)),
                         backgroundColor: Colors.amber,
                         labelStyle: _recordTileStyle['price'],
                         visualDensity: VisualDensity.compact,
@@ -137,7 +159,7 @@ class DetailsView extends StatelessWidget {
                       flex: 8,
                       child: FittedBox(
                         child: Text(
-                          '5555-4444-3333-2222-1111',
+                          txnRecord.token,
                           softWrap: false,
                           style: _recordTileStyle['token'],
                         ),
@@ -154,7 +176,7 @@ class DetailsView extends StatelessWidget {
                         child: FittedBox(
                           child: Text(
                             DateFormat('yyyy-MM-dd - kk:mm')
-                                .format(DateTime.now()),
+                                .format(DateTime.fromMicrosecondsSinceEpoch(txnRecord.date)),
                             style: _recordTileStyle['date'],
                           ),
                         ),
@@ -166,13 +188,13 @@ class DetailsView extends StatelessWidget {
                           children: [
                             FittedBox(
                               child: Text(
-                                'Transaction Ref  :  helloaojodjaodjfa',
+                                'Transaction Ref  :  ${txnRecord.txnReference}',
                                 style: _recordTileStyle['reference'],
                               ),
                             ),
                             FittedBox(
                               child: Text(
-                                'Receipt Ref         :  helloaojodjaodjfa',
+                                'Receipt Ref         :  ${txnRecord.receiptID}',
                                 style: _recordTileStyle['reference'],
                               ),
                             ),

@@ -6,12 +6,14 @@ class User {
   final String email;
   final String username;
   final String telephone;
+  final List transactions;
 
-  const User({required this.uid, required this.email, required this.username, required this.telephone});
+  User({required this.uid, required this.email, required this.username, required this.telephone, required this.transactions});
 
   User.fromFireStore(DocumentSnapshot user)
       : uid = user.id,
         email = user.get('email'),
         username = user.get('username'),
-        telephone = user.get('telephone');
+        telephone = user.get('telephone'),
+        transactions = user.get('transactions') as List<Map<String, dynamic>>;
 }

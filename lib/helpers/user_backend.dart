@@ -1,11 +1,17 @@
+// Core
+import 'dart:convert';
+import 'dart:math';
+
 // External
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:meterpay/models/transaction_record.dart';
+import 'package:crypto/crypto.dart';
 
 // Internal
 import './auth.dart';
-// import '../models/user.dart' as user_model;
+import '../models/user.dart' as userM;
 
 class UserBackend {
   // final user_model.User user;
@@ -102,4 +108,19 @@ class UserBackend {
   void logOut() {
     _auth.signOut();
   }
+
+  Future<userM.User> get getUser async =>
+      userM.User.fromFireStore(await _databaseRoot
+          .collection('users')
+          .doc(_auth.currentUser()!.uid)
+          .get());
+
+  // void addTransaction(TransactionRecord txnRecord) {
+  //   _databaseRoot.collection('users').doc(_auth.currentUser()!.uid).update({
+  //     'transactions': {
+  //       'txnReference': referencer(),
+  //       'token': http,
+  //     }
+  //   });
+  // }
 }

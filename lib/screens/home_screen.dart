@@ -113,7 +113,6 @@ class HomeScreen extends StatelessWidget {
               Navigator.of(context).pushNamed(PurchaseHistoryScreen.routeName);
             },
           ),
-          const Divider(),
           ListTile(
             // selected: true,
             leading: const Icon(

@@ -6,7 +6,7 @@ class TransactionRecord {
   final String units;
   final String meterNumber;
   final String meterName;
-  final String date;
+  final int date;
   final String priceGross;
   final String priceNet;
   final String debt;

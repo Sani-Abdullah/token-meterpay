@@ -1,6 +1,16 @@
+// Core
+import 'dart:convert';
+import 'dart:math';
+
 // External
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:crypto/crypto.dart';
+
+// Internal
+import './../../helpers/auth.dart';
+import '../../models/transaction_record.dart';
+import '../../models/user.dart' as userM;
 
 class RechargeUnitsScreen extends StatelessWidget {
   RechargeUnitsScreen({Key? key}) : super(key: key);
@@ -20,6 +30,46 @@ class RechargeUnitsScreen extends StatelessWidget {
       fontSize: 21,
     ),
   };
+
+  final _auth = Auth();
+
+  String referencer() {
+    final randomTin = Random();
+    var fullRef = sha1
+        .convert(utf8.encode(DateTime.now().millisecondsSinceEpoch.toString() +
+            (_auth.currentUser()!.uid +
+                List.generate(12, (_) => randomTin.nextInt(100)).toString())))
+        .toString()
+        .toLowerCase();
+    var partialRef = '';
+    for (var i in List.generate(16, (_) => randomTin.nextInt(fullRef.length))) {
+      partialRef += fullRef[i];
+    }
+    return partialRef;
+  }
+
+  // TransactionRecord makeTransactionRecord (String units, ) {
+  //   final TransactionRecord transactionRecord = TransactionRecord(
+  //     txnReference: referencer(),
+  //     token: token,
+  //     receiptID: referencer(),
+  //     units: units,
+  //     meterNumber: meterNumber,
+  //     meterName: meterName,
+  //     date: DateTime.now().microsecondsSinceEpoch,
+  //     priceGross: priceGross,
+  //     priceNet: priceNet,
+  //     debt: debt,
+  //     vat: vat,
+  //     serviceCharge: serviceCharge,
+  //     freeUnits: freeUnits,
+  //     paymentType: paymentType,
+  //     username: username,
+  //     address: address,
+  //     meterCategory: meterCategory,
+  //   );
+  //   return transactionRecord;
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -49,13 +99,6 @@ class RechargeUnitsScreen extends StatelessWidget {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      FormBuilderDropdown(
-                        name: 'meter-select',
-                        items: const [
-                          DropdownMenuItem(child: Text('Meter 1')),
-                          DropdownMenuItem(child: Text('Meter 2')),
-                        ],
-                      ),
                       FormBuilderTextField(
                         name: 'amount-enter',
                         controller: _amountTextController,

@@ -9,7 +9,7 @@ import './screens/home_screen.dart';
 import './screens/authentication_screen.dart';
 import './screens/home_screen_d/recharge_screen.dart';
 import './screens/home_screen_d/purchase_history_screen.dart';
-import './screens/home_screen_d/receipt_preview.dart';
+import './screens/home_screen_d/receipt_preview_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -26,16 +26,6 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.deepOrange,
-        // appBarTheme: const AppBarTheme(
-        //   titleTextStyle: TextStyle(
-        //     fontFamily: 'ComicNeue',
-        //     fontSize: 25.0,
-        //   ),
-        //   toolbarTextStyle: TextStyle(
-        //     fontFamily: 'Abel',
-        //     fontSize: 19,
-        //   ),
-        // )
       ),
       home: FutureBuilder(
           future: Firebase.initializeApp(),
