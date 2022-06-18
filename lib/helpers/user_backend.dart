@@ -109,18 +109,69 @@ class UserBackend {
     _auth.signOut();
   }
 
-  Future<userM.User> get getUser async =>
-      userM.User.fromFireStore(await _databaseRoot
-          .collection('users')
-          .doc(_auth.currentUser()!.uid)
-          .get());
+  // <TBD> all function down
 
-  // void addTransaction(TransactionRecord txnRecord) {
-  //   _databaseRoot.collection('users').doc(_auth.currentUser()!.uid).update({
-  //     'transactions': {
-  //       'txnReference': referencer(),
-  //       'token': http,
-  //     }
-  //   });
-  // }
+  Future<userM.User> getUser() async {
+    return userM.User.fromFireStore(await _databaseRoot
+        .collection('users')
+        .doc(_auth.currentUser()!.uid)
+        .get());
+  }
+
+  void addTransaction(TransactionRecord txnRecord) {
+    _databaseRoot.collection('users').doc(_auth.currentUser()!.uid).update({
+      'transactions': {
+        txnRecord.txnReference: {
+          'txnReference': txnRecord.txnReference,
+          'token': txnRecord.token,
+          'receiptID': txnRecord.receiptID,
+          'units': txnRecord.units,
+          'meterNumber': txnRecord.meterNumber,
+          'meterName': txnRecord.meterName,
+          'date': txnRecord.date,
+          'priceGross': txnRecord.priceGross,
+          'priceNet': txnRecord.priceNet,
+          'debt': txnRecord.debt,
+          'vat': txnRecord.vat,
+          'serviceCharge': txnRecord.serviceCharge,
+          'freeUnits': txnRecord.freeUnits,
+          'paymentType': txnRecord.paymentType,
+          'username': txnRecord.username,
+          'address': txnRecord.address,
+          'meterCategory': txnRecord.meterCategory,
+        }
+      }
+    });
+  }
+
+  Future<List<Map<String, dynamic>>> getTransactions() async {
+    final userDoc = await _databaseRoot
+            .collection('users')
+            .doc(_auth.currentUser()!.uid)
+            .get();
+        
+        return userDoc.get('transactions');
+  }
+
+  void addMeter(String meterNumber, String meterName) {
+    _databaseRoot.collection('users').doc(_auth.currentUser()!.uid).update({
+      'meters': {meterNumber: meterName}
+    });
+  }
+
+  Future<void> removeMeter(String meterNumber) async {
+    _databaseRoot
+        .collection('users')
+        .doc(_auth.currentUser()!.uid)
+        .update({meterNumber: FieldValue.delete()});
+  }
+
+  Future<dynamic> getMeters() async {
+    final userDoc = await _databaseRoot
+            .collection('users')
+            .doc(_auth.currentUser()!.uid)
+            .get();
+        
+        return userDoc.get('meters');
+  }
 }

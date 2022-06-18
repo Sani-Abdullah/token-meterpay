@@ -28,7 +28,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Token Purchase',
+          'MeterPay.NG',
           style: _homeScreenStyle['toolbar'],
         ),
         actionsIconTheme: const IconThemeData(
