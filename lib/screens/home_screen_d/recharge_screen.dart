@@ -131,7 +131,9 @@ class _RechargeUnitsScreenState extends State<RechargeUnitsScreen> {
                         label: Text('Add/Remove Meter', style: _rechargeScreenStyle['editmeterlabel'],),
                         icon: const Icon(Icons.edit, color: Colors.black,),
                         style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.black45)),
-                        onPressed: () {},
+                        onPressed: () {
+                          //<TBD: show modal>
+                        },
                       ),
                     ),
                     FutureBuilder<dynamic>(
