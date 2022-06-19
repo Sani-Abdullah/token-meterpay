@@ -153,17 +153,16 @@ class UserBackend {
         return userDoc.get('transactions');
   }
 
-  void addMeter(String meterNumber, String meterName) {
+  Future<void> addMeter(String meterNumber, String meterName) async {
     _databaseRoot.collection('users').doc(_auth.currentUser()!.uid).update({
-      'meters': {meterNumber: meterName}
+      'meters': FieldValue.arrayUnion([{'meterName': meterName, 'meterNumber': meterNumber}])
     });
   }
 
-  Future<void> removeMeter(String meterNumber) async {
-    _databaseRoot
-        .collection('users')
-        .doc(_auth.currentUser()!.uid)
-        .update({meterNumber: FieldValue.delete()});
+  Future<void> removeMeter(dynamic meterObject) async {
+     _databaseRoot.collection('users').doc(_auth.currentUser()!.uid).update({
+      'meters': FieldValue.arrayRemove([meterObject])
+    });
   }
 
   Future<dynamic> getMeters() async {
