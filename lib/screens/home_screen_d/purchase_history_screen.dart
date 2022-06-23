@@ -1,10 +1,8 @@
 // External
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 // Internal
 import '../../components/record_tile.dart';
-import '../../helpers/auth.dart';
 import '../../models/transaction_record.dart';
 
 class PurchaseHistoryScreen extends StatelessWidget {
@@ -32,25 +30,25 @@ class PurchaseHistoryScreen extends StatelessWidget {
           padding: const EdgeInsets.only(top: 4.0),
           physics: const BouncingScrollPhysics(),
           itemCount: 15,
-          itemBuilder: (context, n) => RecordTile(
-              txnRecord: const TransactionRecord(
-            txnReference: 'txnRef',
-            token: 'token',
-            receiptID: 'receiptID',
-            units: 'units',
-            meterNumber: 'meterNumber',
-            meterName: 'meterName',
+          itemBuilder: (context, n) => const RecordTile(
+              txnRecord: TransactionRecord(
+            txnReference: 'oajfe23kmkwo32m3',
+            token: '2222-3333-4444-5555-6666',
+            receiptID: 'oajfe23kmkwo32m3',
+            units: '32.4',
+            meterNumber: '4502718',
+            meterName: 'work-nasrda',
             date: 44444444444444444,
             priceGross: '5500.43',
             priceNet: '4500.00',
-            debt: 'debt',
-            vat: 'vat',
-            serviceCharge: 'serviceCharge',
-            freeUnits: 'freeUnits',
-            paymentType: 'paymentType',
-            username: 'username',
-            address: 'address',
-            meterCategory: 'meterCategory',
+            debt: '0.0',
+            vat: '100.0',
+            serviceCharge: '50.0',
+            freeUnits: '0.0',
+            paymentType: 'card-visa',
+            username: 'Abdul',
+            address: '23 Nnkisi Street, Area 11, Garki, FCT',
+            meterCategory: 'trunk-c7',
           )),
         ));
   }

@@ -7,11 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_paystack/flutter_paystack.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:crypto/crypto.dart';
+import 'package:http/http.dart';
 
 // Internal
 import './../../helpers/auth.dart';
-import '../../helpers/user_backend.dart' as userB;
+import '../../helpers/user_backend.dart' as user_B;
 import '../../secret.dart' as secret;
+import '../../models/transaction_record.dart';
 
 class RechargeUnitsScreen extends StatefulWidget {
   const RechargeUnitsScreen({Key? key}) : super(key: key);
@@ -137,7 +139,7 @@ class _RechargeUnitsScreenState extends State<RechargeUnitsScreen> {
   // TransactionRecord makeTransactionRecord (String units, ) {
   @override
   Widget build(BuildContext context) {
-    final userB.UserBackend _userBackend = userB.UserBackend();
+    final user_B.UserBackend _userBackend = user_B.UserBackend();
     var _isLoading = false;
     final Map<String, String> _payData = {};
 
@@ -239,7 +241,7 @@ class _RechargeUnitsScreenState extends State<RechargeUnitsScreen> {
                                               thickness: 1.2,
                                             ),
                                             addRemoveInfo(
-                                                'Fill and submit meter details'),
+                                                'Submit form to add meter'),
                                             FormBuilder(
                                                 key: _addMeterFormKey,
                                                 child: Padding(
@@ -347,11 +349,6 @@ class _RechargeUnitsScreenState extends State<RechargeUnitsScreen> {
                                                                 _meterNumberController
                                                                     .clear();
 
-                                                                ScaffoldMessenger.of(
-                                                                        context)
-                                                                    .showSnackBar(const SnackBar(
-                                                                        content:
-                                                                            Text('Added new Meter')));
                                                               }
                                                             },
                                                             style: ElevatedButton.styleFrom(
@@ -584,8 +581,8 @@ class _RechargeUnitsScreenState extends State<RechargeUnitsScreen> {
                       onSubmitted: (_) {},
                       validator: (value) {
                         if (value == null) {
-                          return 'Enter amount below 100';
-                        } else if (int.parse(value) > 100) {
+                          return 'Enter Amount';
+                        } else if (int.parse(value) > 10000) {
                           return 'Amout too high';
                         } else {
                           return null;
@@ -597,12 +594,13 @@ class _RechargeUnitsScreenState extends State<RechargeUnitsScreen> {
                     ElevatedButton(
                         onPressed: () async {
                           if (_purchaseFormKey.currentState!.validate()) {
+                            final transactionReference = referencer();
                             Charge charge = Charge()
-                              ..amount = int.parse('${_amountTextController}00')
-                              ..reference =
-                                  '${DateTime.now().microsecondsSinceEpoch}'
-                              //  ..email = _auth.currentUser()?.email;
-                              ..email = 'heatwavemachine@gmail.com';
+                              ..amount = int.parse('${_amountTextController.text}00')
+                              ..reference = transactionReference
+                                  
+                               ..email = _auth.currentUser()?.email;
+                              // ..email = 'heatwavemachine@gmail.com';
 
                             CheckoutResponse response = await plugin.checkout(
                               context,
@@ -611,7 +609,21 @@ class _RechargeUnitsScreenState extends State<RechargeUnitsScreen> {
                               charge: charge,
                             );
 
-                            if (!response.status) {}
+                            _amountTextController.clear();
+
+
+                            if (!response.status) {
+                              // <TBD: if transactions fails>
+
+
+                            // _userBackend.addTransaction(
+                            //   TransactionRecord(
+                            //   txnReference: transactionReference,
+                            //   token: 'token',
+
+                            // ));
+
+                            }
                           }
                         },
                         style: ElevatedButton.styleFrom(

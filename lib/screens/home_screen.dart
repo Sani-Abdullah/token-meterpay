@@ -94,8 +94,8 @@ class HomeScreen extends StatelessWidget {
           ListTile(
             // selected: true,
             leading: const Icon(
-              Icons.money,
-              color: Colors.deepOrange,
+              Icons.speed,
+              color: Color(0xff2A6041),
             ),
             title: const Text('Recharge Meter'),
             onTap: () {
@@ -105,7 +105,7 @@ class HomeScreen extends StatelessWidget {
           ListTile(
             // selected: true,
             leading: const Icon(
-              Icons.check,
+              Icons.history,
               color: Color(0xff2A6041),
             ),
             title: const Text('Purchase History'),
@@ -116,7 +116,7 @@ class HomeScreen extends StatelessWidget {
           ListTile(
             // selected: true,
             leading: const Icon(
-              Icons.check,
+              Icons.headset_mic_outlined,
               color: Color(0xff2A6041),
             ),
             title: const Text('Contact Us'),

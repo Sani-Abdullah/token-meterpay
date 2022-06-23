@@ -44,6 +44,9 @@ dependencies:
   money_formatter: ^0.0.3
   provider: ^6.0.3
   crypto: ^3.0.2
+  pdf: ^3.8.1
+  open_file: ^3.2.1
+  path_provider: ^2.0.11
 
 dev_dependencies:
   flutter_test:
