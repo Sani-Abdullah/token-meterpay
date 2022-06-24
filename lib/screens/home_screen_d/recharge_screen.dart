@@ -1,5 +1,5 @@
 // Core
-import 'dart:convert';
+import 'dart:convert' as convert;
 import 'dart:math';
 
 // External
@@ -7,11 +7,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_paystack/flutter_paystack.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:crypto/crypto.dart';
-import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
+import 'package:meterpay/screens/home_screen_d/generated_token_screen.dart';
+import 'package:meterpay/screens/home_screen_d/generating_token_screen.dart';
+import 'package:provider/provider.dart';
 
 // Internal
 import './../../helpers/auth.dart';
-import '../../helpers/user_backend.dart' as user_B;
+import '../../helpers/user_backend.dart' as user_b;
+import '../../models/user.dart' as user_m;
 import '../../secret.dart' as secret;
 import '../../models/transaction_record.dart';
 
@@ -86,7 +90,9 @@ class _RechargeUnitsScreenState extends State<RechargeUnitsScreen> {
   String referencer() {
     final randomTin = Random();
     var fullRef = sha1
-        .convert(utf8.encode(DateTime.now().millisecondsSinceEpoch.toString() +
+        .convert(convert.utf8.encode(DateTime.now()
+                .millisecondsSinceEpoch
+                .toString() +
             (_auth.currentUser()!.uid +
                 List.generate(12, (_) => randomTin.nextInt(100)).toString())))
         .toString()
@@ -110,6 +116,7 @@ class _RechargeUnitsScreenState extends State<RechargeUnitsScreen> {
 
   final FocusNode _meterNumberFocusNode = FocusNode();
 
+  @override
   void dispose() {
     _meterNumberFocusNode.dispose();
     super.dispose();
@@ -139,9 +146,9 @@ class _RechargeUnitsScreenState extends State<RechargeUnitsScreen> {
   // TransactionRecord makeTransactionRecord (String units, ) {
   @override
   Widget build(BuildContext context) {
-    final user_B.UserBackend _userBackend = user_B.UserBackend();
-    var _isLoading = false;
-    final Map<String, String> _payData = {};
+    final user_b.UserBackend _userBackend = user_b.UserBackend();
+    // var _isLoading = false;
+    final Map<String, dynamic> _payData = {};
 
     return Scaffold(
       appBar: AppBar(
@@ -348,7 +355,6 @@ class _RechargeUnitsScreenState extends State<RechargeUnitsScreen> {
                                                                     .clear();
                                                                 _meterNumberController
                                                                     .clear();
-
                                                               }
                                                             },
                                                             style: ElevatedButton.styleFrom(
@@ -482,9 +488,7 @@ class _RechargeUnitsScreenState extends State<RechargeUnitsScreen> {
                                                                             alignment:
                                                                                 Alignment.center,
                                                                             child:
-                                                                                Row(
-                                                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                                  crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                                                                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.start, children: [
                                                                               Padding(
                                                                                 padding: const EdgeInsets.only(left: 20.0),
                                                                                 child: Text(
@@ -549,6 +553,12 @@ class _RechargeUnitsScreenState extends State<RechargeUnitsScreen> {
                                 // <TBD> validate meters
                                 return null;
                               },
+                              onSaved: (meterIndex) {
+                                _payData['meterNumber'] =
+                                    dataDropDown[meterIndex]['meterNumber'];
+                                _payData['meterName'] =
+                                    dataDropDown[meterIndex]['meterName'];
+                              },
                               items: List.generate(
                                   dataDropDown.length,
                                   (index) => DropdownMenuItem(
@@ -588,7 +598,9 @@ class _RechargeUnitsScreenState extends State<RechargeUnitsScreen> {
                           return null;
                         }
                       },
-                      onSaved: (value) {},
+                      onSaved: (value) {
+                        _payData['amount'] = value!.trim();
+                      },
                     ),
                     const SizedBox(height: 15.0),
                     ElevatedButton(
@@ -596,13 +608,14 @@ class _RechargeUnitsScreenState extends State<RechargeUnitsScreen> {
                           if (_purchaseFormKey.currentState!.validate()) {
                             final transactionReference = referencer();
                             Charge charge = Charge()
-                              ..amount = int.parse('${_amountTextController.text}00')
+                              ..amount =
+                                  int.parse('${_amountTextController.text}00')
                               ..reference = transactionReference
-                                  
-                               ..email = _auth.currentUser()?.email;
-                              // ..email = 'heatwavemachine@gmail.com';
+                              ..email = _auth.currentUser()?.email;
+                            // ..email = 'heatwavemachine@gmail.com';
 
-                            CheckoutResponse response = await plugin.checkout(
+                            CheckoutResponse paymentResponse =
+                                await plugin.checkout(
                               context,
                               method: CheckoutMethod
                                   .card, // Defaults to CheckoutMethod.selectable
@@ -611,18 +624,50 @@ class _RechargeUnitsScreenState extends State<RechargeUnitsScreen> {
 
                             _amountTextController.clear();
 
-
-                            if (!response.status) {
+                            if (paymentResponse.status) {
                               // <TBD: if transactions fails>
 
+                              // show generating token progress indicator
+                              Navigator.of(context)
+                                  .pushNamed(GeneratingTokenScreen.routeName);
 
-                            // _userBackend.addTransaction(
-                            //   TransactionRecord(
-                            //   txnReference: transactionReference,
-                            //   token: 'token',
+                              // request for token
+                              final url = Uri.parse(
+                                  '192.168.129.45:4000/gen-token?amount=${_payData['amount']}&meterNumber=${_payData['meterNumber']}&paymentType=${paymentResponse.method}');
+                              final rawTokenGenResponse = await http.get(url);
+                              final tokenGenResponseBody =
+                                  convert.jsonDecode(rawTokenGenResponse.body)
+                                      as Map<String, dynamic>;
 
-                            // ));
+                              if (rawTokenGenResponse.statusCode == 200) {
+                                TransactionRecord txnRecord = TransactionRecord(
+                                  passed: true,
+                                  meterNumber: _payData['meterNumber'],
+                                  meterName: _payData['meterName'],
+                                  date: DateTime.now().microsecondsSinceEpoch,
+                                  username: Provider.of<user_m.User>(context).username,
+                                  receiptID: referencer(),
+                                  txnReference: transactionReference,
+                                  token: tokenGenResponseBody['token'],
+                                  units: tokenGenResponseBody['units'],
+                                  priceGross: tokenGenResponseBody['priceGross'],
+                                  priceNet: tokenGenResponseBody['priceNet'],
+                                  debt: tokenGenResponseBody['debt'],
+                                  vat: tokenGenResponseBody['vat'],
+                                  serviceCharge: tokenGenResponseBody['serviceCharge'],
+                                  freeUnits: tokenGenResponseBody['freeUnits'],
+                                  paymentType: tokenGenResponseBody['paymentType'],
+                                  address: tokenGenResponseBody['address'],
+                                  meterCategory: tokenGenResponseBody['meterCategory'],
+                                );
 
+                                _userBackend.addTransaction(txnRecord);
+
+                                Navigator.of(context).pop();
+                                Navigator.of(context).pushNamed(
+                                    GeneratedTokenScreen.routeName,
+                                    arguments: txnRecord);
+                              } else {}
                             }
                           }
                         },

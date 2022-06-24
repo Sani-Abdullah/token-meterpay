@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class TransactionRecord {
   final String token;
   final String units;
+  final bool passed;
   final String meterNumber;
   final String meterName;
   final int date;
@@ -23,6 +24,7 @@ class TransactionRecord {
   const TransactionRecord({
     required this.token,
     required this.units,
+    required this.passed,
     required this.meterNumber,
     required this.meterName,
     required this.date,
@@ -44,6 +46,7 @@ class TransactionRecord {
       : txnReference = record.get('txnReference'),
         token = record.get('token'),
         units = record.get('units'),
+        passed = record.get('passed'),
         meterNumber = record.get('meterNumber'),
         meterName = record.get('meterName'),
         date = record.get('date'),

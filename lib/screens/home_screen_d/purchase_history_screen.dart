@@ -36,6 +36,7 @@ class PurchaseHistoryScreen extends StatelessWidget {
             token: '2222-3333-4444-5555-6666',
             receiptID: 'oajfe23kmkwo32m3',
             units: '32.4',
+            passed: true,
             meterNumber: '4502718',
             meterName: 'work-nasrda',
             date: 44444444444444444,

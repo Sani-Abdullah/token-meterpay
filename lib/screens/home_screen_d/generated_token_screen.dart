@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import '../../models/transaction_record.dart';
 import '../../components/receipt_view.dart';
 
-class ReceiptPreviewScreen extends StatelessWidget {
-  ReceiptPreviewScreen({Key? key}) : super(key: key);
-  static const routeName = 'records:preview';
+class GeneratedTokenScreen extends StatelessWidget {
+  GeneratedTokenScreen({Key? key}) : super(key: key);
+  static const routeName = 'home:recharge:generared-token';
 
-  final Map<String, TextStyle> _receiptPreviewScreenStyle = {
+  final Map<String, TextStyle> _generatedTokenScreenStyle = {
     'toolbar': const TextStyle(
       fontFamily: 'Abel',
       fontSize: 21,
@@ -25,7 +25,7 @@ class ReceiptPreviewScreen extends StatelessWidget {
         appBar: AppBar(
           title: Text(
             'Receipt Preview',
-            style: _receiptPreviewScreenStyle['toolbar'],
+            style: _generatedTokenScreenStyle['toolbar'],
           ),
         ),
         body: ReceitpView(txnRecord: txnRecord));
