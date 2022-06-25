@@ -145,7 +145,7 @@ class _RechargeUnitsScreenState extends State<RechargeUnitsScreen> {
 
   // TransactionRecord makeTransactionRecord (String units, ) {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext contextM) {
     final user_b.UserBackend _userBackend = user_b.UserBackend();
     // var _isLoading = false;
     final Map<String, dynamic> _payData = {};
@@ -606,6 +606,7 @@ class _RechargeUnitsScreenState extends State<RechargeUnitsScreen> {
                     ElevatedButton(
                         onPressed: () async {
                           if (_purchaseFormKey.currentState!.validate()) {
+                            _purchaseFormKey.currentState!.save();
                             final transactionReference = referencer();
                             Charge charge = Charge()
                               ..amount =
@@ -616,28 +617,39 @@ class _RechargeUnitsScreenState extends State<RechargeUnitsScreen> {
 
                             CheckoutResponse paymentResponse =
                                 await plugin.checkout(
-                              context,
+                              contextM,
                               method: CheckoutMethod
                                   .card, // Defaults to CheckoutMethod.selectable
                               charge: charge,
                             );
 
                             _amountTextController.clear();
+                            print('--------------------------');
+                            print(paymentResponse.status);
 
                             if (paymentResponse.status) {
                               // <TBD: if transactions fails>
 
-                              // show generating token progress indicator
-                              Navigator.of(context)
-                                  .pushNamed(GeneratingTokenScreen.routeName);
+                              // // show generating token progress indicator
+                              Navigator.of(contextM).pushNamed(
+                                  GeneratingTokenScreen.routeName);
 
+                              print('--------------------------22222');
                               // request for token
+                              final url2 =
+                                  'http://192.168.129.45:4000/gen-token?amount=${_payData['amount']}&meterNumber=${_payData['meterNumber']}&paymentType=${paymentResponse.method}';
+                              print(url2);
                               final url = Uri.parse(
-                                  '192.168.129.45:4000/gen-token?amount=${_payData['amount']}&meterNumber=${_payData['meterNumber']}&paymentType=${paymentResponse.method}');
+                                  'http://192.168.129.45:4000/gen-token?amount=${_payData['amount']}&meterNumber=${_payData['meterNumber']}&paymentType=${paymentResponse.method}');
                               final rawTokenGenResponse = await http.get(url);
                               final tokenGenResponseBody =
                                   convert.jsonDecode(rawTokenGenResponse.body)
                                       as Map<String, dynamic>;
+
+                              print('--------------------------33333');
+
+                              print(rawTokenGenResponse.statusCode);
+                              print(tokenGenResponseBody);
 
                               if (rawTokenGenResponse.statusCode == 200) {
                                 TransactionRecord txnRecord = TransactionRecord(
@@ -645,28 +657,35 @@ class _RechargeUnitsScreenState extends State<RechargeUnitsScreen> {
                                   meterNumber: _payData['meterNumber'],
                                   meterName: _payData['meterName'],
                                   date: DateTime.now().microsecondsSinceEpoch,
-                                  username: Provider.of<user_m.User>(context).username,
+                                  // username: Provider.of<user_m.User>(context, listen: false)
+                                  //     .username,
+                                  username: 'user-A', // <TBD: username above dynamic>
                                   receiptID: referencer(),
                                   txnReference: transactionReference,
                                   token: tokenGenResponseBody['token'],
-                                  units: tokenGenResponseBody['units'],
-                                  priceGross: tokenGenResponseBody['priceGross'],
+                                  units: tokenGenResponseBody['units'].toString(),
+                                  priceGross:
+                                      tokenGenResponseBody['priceGross'],
                                   priceNet: tokenGenResponseBody['priceNet'],
-                                  debt: tokenGenResponseBody['debt'],
-                                  vat: tokenGenResponseBody['vat'],
-                                  serviceCharge: tokenGenResponseBody['serviceCharge'],
-                                  freeUnits: tokenGenResponseBody['freeUnits'],
-                                  paymentType: tokenGenResponseBody['paymentType'],
+                                  debt: tokenGenResponseBody['debt'].toString(),
+                                  vat: tokenGenResponseBody['vat'].toString(),
+                                  serviceCharge:
+                                      tokenGenResponseBody['serviceCharge'].toString(),
+                                  freeUnits: tokenGenResponseBody['freeUnits'].toString(),
+                                  paymentType:
+                                      tokenGenResponseBody['paymentType'],
                                   address: tokenGenResponseBody['address'],
-                                  meterCategory: tokenGenResponseBody['meterCategory'],
+                                  meterCategory:
+                                      tokenGenResponseBody['meterCategory'],
                                 );
 
-                                _userBackend.addTransaction(txnRecord);
-
-                                Navigator.of(context).pop();
-                                Navigator.of(context).pushNamed(
+                                _userBackend.addTransaction(
+                                    txnRecord); // <TBD: do this on server reliably after gen-token>
+                                // Navigator.of(contextM).pop();
+                                Navigator.of(contextM).popAndPushNamed(
                                     GeneratedTokenScreen.routeName,
                                     arguments: txnRecord);
+
                               } else {}
                             }
                           }

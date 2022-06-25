@@ -14,7 +14,9 @@ class ReceitpView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(children: <Widget>[
+    return ListView(
+      physics: const BouncingScrollPhysics(),
+      children: <Widget>[
       DataTable(
         border: TableBorder.all(width: 0.08, color: Colors.grey),
         columns: const [
