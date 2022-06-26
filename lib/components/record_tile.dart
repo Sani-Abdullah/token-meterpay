@@ -119,11 +119,11 @@ class OptionsView extends StatelessWidget {
               () => Navigator.of(context).pushNamed(
                   ReceiptPreviewScreen.routeName,
                   arguments: txnRecord)),
-          optionButton('Save PDF', const Icon(Icons.picture_as_pdf_outlined),
+          optionButton('Share PDF', const Icon(Icons.picture_as_pdf_outlined),
               const Color.fromARGB(52, 255, 153, 0), () {
-                savePDF(txnRecord);
+                sharePDF(txnRecord);
               }),
-          optionButton('Save Image', const Icon(Icons.image_outlined),
+          optionButton('Share Image', const Icon(Icons.image_outlined),
               Colors.black.withOpacity(.55), () {}),
         ],
       ),

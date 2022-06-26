@@ -1,17 +1,12 @@
-// Core
-import 'dart:convert';
-import 'dart:math';
-
 // External
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:meterpay/models/transaction_record.dart';
-import 'package:crypto/crypto.dart';
 
 // Internal
 import './auth.dart';
-import '../models/user.dart' as userM;
+import '../models/user.dart' as user_m;
 
 class UserBackend {
   // final user_model.User user;
@@ -102,6 +97,8 @@ class UserBackend {
     _databaseRoot.collection('users').doc(instance?.uid).set({
       'telephone': telephone,
       'username': username,
+      'meters': [],
+      'transactions': [],
     });
   }
 
@@ -111,8 +108,8 @@ class UserBackend {
 
   // <TBD> all function down
 
-  Future<userM.User> getUser() async {
-    return userM.User.fromFireStore(await _databaseRoot
+  Future<user_m.User> getUser() async {
+    return user_m.User.fromFireStore(await _databaseRoot
         .collection('users')
         .doc(_auth.currentUser()!.uid)
         .get());
@@ -120,12 +117,14 @@ class UserBackend {
 
   void addTransaction(TransactionRecord txnRecord) {
     _databaseRoot.collection('users').doc(_auth.currentUser()!.uid).update({
-      'transactions': {
-        txnRecord.txnReference: {
+      'transactions': FieldValue.arrayUnion([
+        {
           'txnReference': txnRecord.txnReference,
           'token': txnRecord.token,
           'receiptID': txnRecord.receiptID,
           'units': txnRecord.units,
+          'passed': txnRecord.passed,
+          'message': txnRecord.message,
           'meterNumber': txnRecord.meterNumber,
           'meterName': txnRecord.meterName,
           'date': txnRecord.date,
@@ -140,37 +139,39 @@ class UserBackend {
           'address': txnRecord.address,
           'meterCategory': txnRecord.meterCategory,
         }
-      }
+      ])
     });
   }
 
   Future<List<Map<String, dynamic>>> getTransactions() async {
     final userDoc = await _databaseRoot
-            .collection('users')
-            .doc(_auth.currentUser()!.uid)
-            .get();
-        
-        return userDoc.get('transactions');
+        .collection('users')
+        .doc(_auth.currentUser()!.uid)
+        .get();
+
+    return userDoc.get('transactions');
   }
 
   Future<void> addMeter(String meterNumber, String meterName) async {
     _databaseRoot.collection('users').doc(_auth.currentUser()!.uid).update({
-      'meters': FieldValue.arrayUnion([{'meterName': meterName, 'meterNumber': meterNumber}])
+      'meters': FieldValue.arrayUnion([
+        {'meterName': meterName, 'meterNumber': meterNumber}
+      ])
     });
   }
 
   Future<void> removeMeter(dynamic meterObject) async {
-     _databaseRoot.collection('users').doc(_auth.currentUser()!.uid).update({
+    _databaseRoot.collection('users').doc(_auth.currentUser()!.uid).update({
       'meters': FieldValue.arrayRemove([meterObject])
     });
   }
 
   Future<dynamic> getMeters() async {
     final userDoc = await _databaseRoot
-            .collection('users')
-            .doc(_auth.currentUser()!.uid)
-            .get();
-        
-        return userDoc.get('meters');
+        .collection('users')
+        .doc(_auth.currentUser()!.uid)
+        .get();
+
+    return userDoc.get('meters');
   }
 }

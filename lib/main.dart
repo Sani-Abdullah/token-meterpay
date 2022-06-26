@@ -2,12 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:provider/provider.dart';
 
 // Internal
-import './models/user.dart' as user_m;
 import './helpers/auth.dart';
-import './helpers/user_backend.dart' as user_b;
 import './screens/home_screen.dart';
 import './screens/authentication_screen.dart';
 import './screens/home_screen_d/recharge_screen.dart';
@@ -18,20 +15,12 @@ import './screens/home_screen_d/generated_token_screen.dart';
 
 void main() {
   runApp(
-    MultiProvider(
-      providers: [
-        FutureProvider<user_m.User?>(
-          initialData: null,
-          create: (_) => user_b.UserBackend().getUser(),
-        ),
-      ],
-      child: const MyApp(),
-    ),
+    const MeterPay()
   );
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class MeterPay extends StatelessWidget {
+  const MeterPay({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

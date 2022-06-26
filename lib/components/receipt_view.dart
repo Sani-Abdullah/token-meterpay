@@ -54,7 +54,7 @@ class ReceitpView extends StatelessWidget {
           ]),
           DataRow(cells: [
             const DataCell(Text('Date')),
-            DataCell(Text(txnRecord.date.toString())),
+            DataCell(Text(DateTime.fromMicrosecondsSinceEpoch(txnRecord.date).toString())),
           ]),
           DataRow(cells: [
             const DataCell(Text('Price Gross')),

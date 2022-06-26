@@ -1,10 +1,8 @@
-// External
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class TransactionRecord {
   final String token;
   final String units;
   final bool passed;
+  final String message;
   final String meterNumber;
   final String meterName;
   final int date;
@@ -25,6 +23,7 @@ class TransactionRecord {
     required this.token,
     required this.units,
     required this.passed,
+    required this.message,
     required this.meterNumber,
     required this.meterName,
     required this.date,
@@ -42,23 +41,24 @@ class TransactionRecord {
     required this.meterCategory,
   });
 
-  TransactionRecord.fromFireStore(DocumentSnapshot record)
-      : txnReference = record.get('txnReference'),
-        token = record.get('token'),
-        units = record.get('units'),
-        passed = record.get('passed'),
-        meterNumber = record.get('meterNumber'),
-        meterName = record.get('meterName'),
-        date = record.get('date'),
-        priceGross = record.get('priceGross'),
-        priceNet = record.get('priceNet'),
-        debt = record.get('debt'),
-        vat = record.get('vat'),
-        serviceCharge = record.get('serviceCharge'),
-        receiptID = record.get('receiptID'),
-        freeUnits = record.get('freeUnits'),
-        paymentType = record.get('paymentType'),
-        username = record.get('username'),
-        address = record.get('address'),
-        meterCategory = record.get('meterCategory');
+  TransactionRecord.fromMap(Map record)
+      : txnReference = record['txnReference'],
+        token = record['token'],
+        units = record['units'],
+        passed = record['passed'],
+        message = record['message'],
+        meterNumber = record['meterNumber'],
+        meterName = record['meterName'],
+        date = record['date'],
+        priceGross = record['priceGross'],
+        priceNet = record['priceNet'],
+        debt = record['debt'],
+        vat = record['vat'],
+        serviceCharge = record['serviceCharge'],
+        receiptID = record['receiptID'],
+        freeUnits = record['freeUnits'],
+        paymentType = record['paymentType'],
+        username = record['username'],
+        address = record['address'],
+        meterCategory = record['meterCategory'];
 }

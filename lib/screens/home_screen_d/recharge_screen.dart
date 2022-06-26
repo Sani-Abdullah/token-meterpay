@@ -624,21 +624,15 @@ class _RechargeUnitsScreenState extends State<RechargeUnitsScreen> {
                             );
 
                             _amountTextController.clear();
-                            print('--------------------------');
-                            print(paymentResponse.status);
 
-                            if (paymentResponse.status) {
-                              // <TBD: if transactions fails>
+                              final user_m.User thisUser =
+                                  await user_b.UserBackend().getUser();
+                            if (paymentResponse.status && paymentResponse.message == 'Success') {
 
                               // // show generating token progress indicator
-                              Navigator.of(contextM).pushNamed(
-                                  GeneratingTokenScreen.routeName);
+                              Navigator.of(contextM)
+                                  .pushNamed(GeneratingTokenScreen.routeName);
 
-                              print('--------------------------22222');
-                              // request for token
-                              final url2 =
-                                  'http://192.168.129.45:4000/gen-token?amount=${_payData['amount']}&meterNumber=${_payData['meterNumber']}&paymentType=${paymentResponse.method}';
-                              print(url2);
                               final url = Uri.parse(
                                   'http://192.168.129.45:4000/gen-token?amount=${_payData['amount']}&meterNumber=${_payData['meterNumber']}&paymentType=${paymentResponse.method}');
                               final rawTokenGenResponse = await http.get(url);
@@ -646,32 +640,33 @@ class _RechargeUnitsScreenState extends State<RechargeUnitsScreen> {
                                   convert.jsonDecode(rawTokenGenResponse.body)
                                       as Map<String, dynamic>;
 
-                              print('--------------------------33333');
-
-                              print(rawTokenGenResponse.statusCode);
-                              print(tokenGenResponseBody);
 
                               if (rawTokenGenResponse.statusCode == 200) {
                                 TransactionRecord txnRecord = TransactionRecord(
                                   passed: true,
+                                  message: paymentResponse.message,
                                   meterNumber: _payData['meterNumber'],
                                   meterName: _payData['meterName'],
                                   date: DateTime.now().microsecondsSinceEpoch,
                                   // username: Provider.of<user_m.User>(context, listen: false)
                                   //     .username,
-                                  username: 'user-A', // <TBD: username above dynamic>
+                                  // username: 'user-A', // <TBD: username above dynamic>
+                                  username: thisUser.username,
                                   receiptID: referencer(),
                                   txnReference: transactionReference,
                                   token: tokenGenResponseBody['token'],
-                                  units: tokenGenResponseBody['units'].toString(),
+                                  units:
+                                      tokenGenResponseBody['units'].toString(),
                                   priceGross:
                                       tokenGenResponseBody['priceGross'],
                                   priceNet: tokenGenResponseBody['priceNet'],
                                   debt: tokenGenResponseBody['debt'].toString(),
                                   vat: tokenGenResponseBody['vat'].toString(),
                                   serviceCharge:
-                                      tokenGenResponseBody['serviceCharge'].toString(),
-                                  freeUnits: tokenGenResponseBody['freeUnits'].toString(),
+                                      tokenGenResponseBody['serviceCharge']
+                                          .toString(),
+                                  freeUnits: tokenGenResponseBody['freeUnits']
+                                      .toString(),
                                   paymentType:
                                       tokenGenResponseBody['paymentType'],
                                   address: tokenGenResponseBody['address'],
@@ -685,8 +680,42 @@ class _RechargeUnitsScreenState extends State<RechargeUnitsScreen> {
                                 Navigator.of(contextM).popAndPushNamed(
                                     GeneratedTokenScreen.routeName,
                                     arguments: txnRecord);
+                              } else {
+                                // <TBD: Failed http request but transaction success>
 
-                              } else {}
+                                // Navigator.of(context).popAndPushNamed(InternalServerErrorScreen.routeName);
+
+                                
+                              }
+                            } else {
+
+                              TransactionRecord txnRecord = TransactionRecord(
+                                  passed: false,
+                                  message: paymentResponse.message,
+                                  meterNumber: _payData['meterNumber'],
+                                  meterName: _payData['meterName'],
+                                  date: DateTime.now().microsecondsSinceEpoch,
+                                  // username: Provider.of<user_m.User>(context, listen: false)
+                                  //     .username,
+                                  // username: 'user-A', // <TBD: username above dynamic>
+                                  username: thisUser.username,
+                                  receiptID: referencer(),
+                                  txnReference: transactionReference,
+                                  token: '-',
+                                  units: '-',
+                                  priceGross: '-',
+                                  priceNet: '-',
+                                  debt: '-',
+                                  vat: '-',
+                                  serviceCharge: '-',
+                                  freeUnits: '-',
+                                  paymentType: '-',
+                                  address: '-',
+                                  meterCategory: '-',
+                                );
+
+                                _userBackend.addTransaction(txnRecord);
+
                             }
                           }
                         },

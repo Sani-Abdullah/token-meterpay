@@ -1,9 +1,11 @@
 // External
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 // Internal
 import '../../components/record_tile.dart';
 import '../../models/transaction_record.dart';
+import '../../helpers/auth.dart';
 
 class PurchaseHistoryScreen extends StatelessWidget {
   PurchaseHistoryScreen({Key? key}) : super(key: key);
@@ -13,11 +15,16 @@ class PurchaseHistoryScreen extends StatelessWidget {
     'toolbar': const TextStyle(
       fontFamily: 'Abel',
       fontSize: 21,
+    ),
+    'empty': const TextStyle(
+      fontFamily: 'Abel',
+      fontSize: 25,
     )
   };
 
   @override
   Widget build(BuildContext context) {
+    final Auth _auth = Auth();
     return Scaffold(
         appBar: AppBar(
           title: Text(
@@ -25,32 +32,60 @@ class PurchaseHistoryScreen extends StatelessWidget {
             style: _purchaseHistoryScreenStyle['toolbar'],
           ),
         ),
-        body: ListView.builder(
-          //<TBD>: bringing from user records
-          padding: const EdgeInsets.only(top: 4.0),
-          physics: const BouncingScrollPhysics(),
-          itemCount: 15,
-          itemBuilder: (context, n) => const RecordTile(
-              txnRecord: TransactionRecord(
-            txnReference: 'oajfe23kmkwo32m3',
-            token: '2222-3333-4444-5555-6666',
-            receiptID: 'oajfe23kmkwo32m3',
-            units: '32.4',
-            passed: true,
-            meterNumber: '4502718',
-            meterName: 'work-nasrda',
-            date: 44444444444444444,
-            priceGross: '5500.43',
-            priceNet: '4500.00',
-            debt: '0.0',
-            vat: '100.0',
-            serviceCharge: '50.0',
-            freeUnits: '0.0',
-            paymentType: 'card-visa',
-            username: 'Abdul',
-            address: '23 Nnkisi Street, Area 11, Garki, FCT',
-            meterCategory: 'trunk-c7',
-          )),
-        ));
+        body: StreamBuilder<DocumentSnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('users')
+                .doc(_auth.currentUser()!.uid)
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting ||
+                  !snapshot.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              } else {
+                final List transactions = snapshot.data!.get('transactions');
+                // filter out failed transactions
+                transactions.removeWhere((transaction) => transaction['message'] != 'Success');
+                if (transactions.isEmpty) {
+                  return Center(
+                    child: Text(
+                      'Records Empty',
+                      style: _purchaseHistoryScreenStyle['empty'],
+                    ),
+                  );
+                }
+                return ListView.builder(
+                    //Done ... <TBD>: bringing from user records
+                    padding: const EdgeInsets.only(top: 4.0),
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: transactions.length,
+                    itemBuilder: (context, transactionIndex) {
+                      final TransactionRecord transaction =
+                          TransactionRecord.fromMap(
+                              transactions[transactionIndex]);
+                      return RecordTile(
+                          txnRecord: TransactionRecord(
+                        txnReference: transaction.txnReference,
+                        token: transaction.token,
+                        receiptID: transaction.receiptID,
+                        units: transaction.units,
+                        passed: transaction.passed,
+                        message: transaction.message,
+                        meterNumber: transaction.meterNumber,
+                        meterName: transaction.meterName,
+                        date: transaction.date,
+                        priceGross: transaction.priceGross,
+                        priceNet: transaction.priceNet,
+                        debt: transaction.debt,
+                        vat: transaction.vat,
+                        serviceCharge: transaction.serviceCharge,
+                        freeUnits: transaction.freeUnits,
+                        paymentType: transaction.paymentType,
+                        username: transaction.username,
+                        address: transaction.address,
+                        meterCategory: transaction.meterCategory,
+                      ));
+                    });
+              }
+            }));
   }
 }
