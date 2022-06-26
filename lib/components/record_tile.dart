@@ -124,7 +124,9 @@ class OptionsView extends StatelessWidget {
                 sharePDF(txnRecord);
               }),
           optionButton('Share Image', const Icon(Icons.image_outlined),
-              Colors.black.withOpacity(.55), () {}),
+              Colors.black.withOpacity(.55), () {
+                shareRenderedPDFImage(txnRecord, Colors.white);
+              }),
         ],
       ),
     );

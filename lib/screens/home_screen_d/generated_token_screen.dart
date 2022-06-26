@@ -47,7 +47,14 @@ class GeneratedTokenScreen extends StatelessWidget {
                 const PopupMenuItem(
                     value: 0,
                     child: Text(
-                      'Share Receipt',
+                      'Share as PDF',
+                      style:
+                          TextStyle(fontFamily: 'Monteserat', fontSize: 15.0),
+                    )),
+                    const PopupMenuItem(
+                    value: 1,
+                    child: Text(
+                      'Share as Image',
                       style:
                           TextStyle(fontFamily: 'Monteserat', fontSize: 15.0),
                     )),
@@ -57,7 +64,7 @@ class GeneratedTokenScreen extends StatelessWidget {
                 if (value == 0) {
                   sharePDF(txnRecord);
                 } else if (value == 1) {
-                  //<TBD> Show About Us Page
+                shareRenderedPDFImage(txnRecord, Colors.white);
                 }
               },
             ),

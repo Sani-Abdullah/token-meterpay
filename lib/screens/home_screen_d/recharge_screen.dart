@@ -8,11 +8,11 @@ import 'package:flutter_paystack/flutter_paystack.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
-import 'package:meterpay/screens/home_screen_d/generated_token_screen.dart';
-import 'package:meterpay/screens/home_screen_d/generating_token_screen.dart';
-import 'package:provider/provider.dart';
 
 // Internal
+import './generated_token_screen.dart';
+import './generating_token_screen.dart';
+import './internal_server_error_screen.dart';
 import './../../helpers/auth.dart';
 import '../../helpers/user_backend.dart' as user_b;
 import '../../models/user.dart' as user_m;
@@ -625,97 +625,96 @@ class _RechargeUnitsScreenState extends State<RechargeUnitsScreen> {
 
                             _amountTextController.clear();
 
-                              final user_m.User thisUser =
-                                  await user_b.UserBackend().getUser();
-                            if (paymentResponse.status && paymentResponse.message == 'Success') {
-
+                            final user_m.User thisUser =
+                                await user_b.UserBackend().getUser();
+                            if (paymentResponse.status &&
+                                paymentResponse.message == 'Success') {
                               // // show generating token progress indicator
                               Navigator.of(contextM)
                                   .pushNamed(GeneratingTokenScreen.routeName);
 
                               final url = Uri.parse(
                                   'http://192.168.129.45:4000/gen-token?amount=${_payData['amount']}&meterNumber=${_payData['meterNumber']}&paymentType=${paymentResponse.method}');
-                              final rawTokenGenResponse = await http.get(url);
-                              final tokenGenResponseBody =
-                                  convert.jsonDecode(rawTokenGenResponse.body)
+                              http.get(url).then((rawTokenGenResponse) {
+                                if (rawTokenGenResponse.statusCode == 200) {
+                                  final tokenGenResponseBody = convert
+                                          .jsonDecode(rawTokenGenResponse.body)
                                       as Map<String, dynamic>;
+                                  TransactionRecord txnRecord =
+                                      TransactionRecord(
+                                    passed: true,
+                                    message: paymentResponse.message,
+                                    meterNumber: _payData['meterNumber'],
+                                    meterName: _payData['meterName'],
+                                    date: DateTime.now().microsecondsSinceEpoch,
+                                    // username: Provider.of<user_m.User>(context, listen: false)
+                                    //     .username,
+                                    // username: 'user-A', // <TBD: username above dynamic>
+                                    username: thisUser.username,
+                                    receiptID: referencer(),
+                                    txnReference: transactionReference,
+                                    token: tokenGenResponseBody['token'],
+                                    units: tokenGenResponseBody['units']
+                                        .toString(),
+                                    priceGross:
+                                        tokenGenResponseBody['priceGross'],
+                                    priceNet: tokenGenResponseBody['priceNet'],
+                                    debt:
+                                        tokenGenResponseBody['debt'].toString(),
+                                    vat: tokenGenResponseBody['vat'].toString(),
+                                    serviceCharge:
+                                        tokenGenResponseBody['serviceCharge']
+                                            .toString(),
+                                    freeUnits: tokenGenResponseBody['freeUnits']
+                                        .toString(),
+                                    paymentType:
+                                        tokenGenResponseBody['paymentType'],
+                                    address: tokenGenResponseBody['address'],
+                                    meterCategory:
+                                        tokenGenResponseBody['meterCategory'],
+                                  );
 
-
-                              if (rawTokenGenResponse.statusCode == 200) {
-                                TransactionRecord txnRecord = TransactionRecord(
-                                  passed: true,
-                                  message: paymentResponse.message,
-                                  meterNumber: _payData['meterNumber'],
-                                  meterName: _payData['meterName'],
-                                  date: DateTime.now().microsecondsSinceEpoch,
-                                  // username: Provider.of<user_m.User>(context, listen: false)
-                                  //     .username,
-                                  // username: 'user-A', // <TBD: username above dynamic>
-                                  username: thisUser.username,
-                                  receiptID: referencer(),
-                                  txnReference: transactionReference,
-                                  token: tokenGenResponseBody['token'],
-                                  units:
-                                      tokenGenResponseBody['units'].toString(),
-                                  priceGross:
-                                      tokenGenResponseBody['priceGross'],
-                                  priceNet: tokenGenResponseBody['priceNet'],
-                                  debt: tokenGenResponseBody['debt'].toString(),
-                                  vat: tokenGenResponseBody['vat'].toString(),
-                                  serviceCharge:
-                                      tokenGenResponseBody['serviceCharge']
-                                          .toString(),
-                                  freeUnits: tokenGenResponseBody['freeUnits']
-                                      .toString(),
-                                  paymentType:
-                                      tokenGenResponseBody['paymentType'],
-                                  address: tokenGenResponseBody['address'],
-                                  meterCategory:
-                                      tokenGenResponseBody['meterCategory'],
-                                );
-
-                                _userBackend.addTransaction(
-                                    txnRecord); // <TBD: do this on server reliably after gen-token>
-                                // Navigator.of(contextM).pop();
-                                Navigator.of(contextM).popAndPushNamed(
-                                    GeneratedTokenScreen.routeName,
-                                    arguments: txnRecord);
-                              } else {
-                                // <TBD: Failed http request but transaction success>
-
-                                // Navigator.of(context).popAndPushNamed(InternalServerErrorScreen.routeName);
-
-                                
-                              }
+                                  _userBackend.addTransaction(
+                                      txnRecord); // <TBD: do this on server reliably after gen-token>
+                                  // Navigator.of(contextM).pop();
+                                  Navigator.of(contextM).popAndPushNamed(
+                                      GeneratedTokenScreen.routeName,
+                                      arguments: txnRecord);
+                                }
+                              }).onError((error, stackTrace) {
+                                Navigator.of(context).popAndPushNamed(
+                                    InternalServerErrorScreen.routeName);
+                                    // <TBD: Batch processing: ensure that token reaches customer because they paid - sms them? >
+                                    // <TBD: sms with telephone through thisUser.telephone;>
+                                    
+                              });
                             } else {
-
                               TransactionRecord txnRecord = TransactionRecord(
-                                  passed: false,
-                                  message: paymentResponse.message,
-                                  meterNumber: _payData['meterNumber'],
-                                  meterName: _payData['meterName'],
-                                  date: DateTime.now().microsecondsSinceEpoch,
-                                  // username: Provider.of<user_m.User>(context, listen: false)
-                                  //     .username,
-                                  // username: 'user-A', // <TBD: username above dynamic>
-                                  username: thisUser.username,
-                                  receiptID: referencer(),
-                                  txnReference: transactionReference,
-                                  token: '-',
-                                  units: '-',
-                                  priceGross: '-',
-                                  priceNet: '-',
-                                  debt: '-',
-                                  vat: '-',
-                                  serviceCharge: '-',
-                                  freeUnits: '-',
-                                  paymentType: '-',
-                                  address: '-',
-                                  meterCategory: '-',
-                                );
+                                passed: false,
+                                message: paymentResponse.message,
+                                meterNumber: _payData['meterNumber'],
+                                meterName: _payData['meterName'],
+                                date: DateTime.now().microsecondsSinceEpoch,
+                                // username: Provider.of<user_m.User>(context, listen: false)
+                                //     .username,
+                                // username: 'user-A', // <TBD: username above dynamic>
+                                username: thisUser.username,
+                                receiptID: referencer(),
+                                txnReference: transactionReference,
+                                token: '-',
+                                units: '-',
+                                priceGross: '-',
+                                priceNet: '-',
+                                debt: '-',
+                                vat: '-',
+                                serviceCharge: '-',
+                                freeUnits: '-',
+                                paymentType: '-',
+                                address: '-',
+                                meterCategory: '-',
+                              );
 
-                                _userBackend.addTransaction(txnRecord);
-
+                              _userBackend.addTransaction(txnRecord);
                             }
                           }
                         },

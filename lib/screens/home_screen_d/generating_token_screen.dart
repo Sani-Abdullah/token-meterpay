@@ -12,7 +12,7 @@ class GeneratingTokenScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: const [
             Text(
-              'Generating Token ...',
+              'Generating Token ..',
               style: TextStyle(
                 fontFamily: 'Abel',
                 fontSize: 21,

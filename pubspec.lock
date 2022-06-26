@@ -352,6 +352,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.8.1"
+  pdf_image_renderer:
+    dependency: "direct main"
+    description:
+      name: pdf_image_renderer
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.6.2"
+  pdf_render:
+    dependency: "direct main"
+    description:
+      name: pdf_render
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.0"
   permission_handler:
     dependency: "direct main"
     description:

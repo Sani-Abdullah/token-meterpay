@@ -12,6 +12,7 @@ import './screens/home_screen_d/purchase_history_screen.dart';
 import './screens/home_screen_d/receipt_preview_screen.dart';
 import './screens/home_screen_d/generating_token_screen.dart';
 import './screens/home_screen_d/generated_token_screen.dart';
+import './screens/home_screen_d/internal_server_error_screen.dart';
 
 void main() {
   runApp(
@@ -55,6 +56,7 @@ class MeterPay extends StatelessWidget {
         ReceiptPreviewScreen.routeName: (ctx) => ReceiptPreviewScreen(),
         GeneratingTokenScreen.routeName: (ctx) => const GeneratingTokenScreen(),
         GeneratedTokenScreen.routeName: (ctx) => GeneratedTokenScreen(),
+        InternalServerErrorScreen.routeName: (ctx) => const InternalServerErrorScreen(),
       },
     );
   }
