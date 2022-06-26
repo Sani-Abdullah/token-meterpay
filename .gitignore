@@ -48,5 +48,6 @@ app.*.map.json
 
 # <To Do>
 /android/app/google-services.json
+/android/key.properties
 /lib/secret.dart
 /lib/main_one.dart
